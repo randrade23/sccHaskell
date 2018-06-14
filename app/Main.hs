@@ -260,8 +260,8 @@ unrollFacts bs (AConApp c ds) = AConApp c (map (unrollFacts bs) ds)
 unrollFacts bs (APrimOp c ds) = APrimOp c (map (unrollFacts bs) ds)
 unrollFacts bs e = e
 
-inlineContractDef :: [Name] -> ContractEnv -> AExp -> AExp
-inlineContractDef vs cEnv ex =
+inlineContractDef :: ContractEnv -> AExp -> AExp
+inlineContractDef cEnv ex =
   case ex of
     AGlobal i -> case (lookupContractEnv cEnv (idName i)) of
       Nothing -> (AGlobal i)
@@ -269,12 +269,12 @@ inlineContractDef vs cEnv ex =
     AVar v -> case (lookupContractEnv cEnv v) of
       Nothing -> AVar v
       Just c ->  (ARequires v (AVar v) (toAExp c))
-    ALam x e -> ALam x (inlineContractDef (x:vs) cEnv e)
-    AApp f a -> AApp (inlineContractDef vs cEnv f) (inlineContractDef vs cEnv a)
-    APrimOp op es -> APrimOp op (map (inlineContractDef vs cEnv) es)
-    AConApp c es -> AConApp c (map (inlineContractDef vs cEnv) es)
-    ALet x r b -> ALet x (inlineContractDef vs cEnv r) (inlineContractDef (x:vs) cEnv b)
-    ACase e0 x alts -> ACase (inlineContractDef vs cEnv e0) x (map (\(a,b,c) -> (a,b,inlineContractDef ((x:b)++vs) cEnv c)) alts)
+    ALam x e -> ALam x (inlineContractDef cEnv e)
+    AApp f a -> AApp (inlineContractDef cEnv f) (inlineContractDef cEnv a)
+    APrimOp op es -> APrimOp op (map (inlineContractDef cEnv) es)
+    AConApp c es -> AConApp c (map (inlineContractDef cEnv) es)
+    ALet x r b -> ALet x (inlineContractDef cEnv r) (inlineContractDef cEnv b)
+    ACase e0 x alts -> ACase (inlineContractDef cEnv e0) x (map (\(a,b,c) -> (a,b,inlineContractDef cEnv c)) alts)
     e -> e
 
 checkAndBuild :: ContractEnv -> Int -> [ADecl] -> [ADecl] -> [ADecl]
@@ -283,14 +283,14 @@ checkAndBuild cEnv n bs ((ADef f e t):ds) =
   case t of
     Nothing ->
       let
-        fbody = inlineContractDef [f] cEnv e
+        fbody = inlineContractDef cEnv e
         body2 = AEnsures fbody okContract
         a = checkAExp f bs cEnv n [] body2
       in
         (ADef f a (Just okContract)) : checkAndBuild cEnv n bs ds
     Just rt ->
       let
-        fbody = inlineContractDef [f] cEnv e
+        fbody = inlineContractDef cEnv e
         body2 = AEnsures fbody rt
         a = checkAExp f bs cEnv n [] body2
       in
