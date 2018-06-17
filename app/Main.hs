@@ -249,7 +249,7 @@ unrollFacts binds (AApp (AVar v) e@(AConApp _ _)) =
       Just e -> e
   in
     AApp fe e
-unrollFacts bs (AApp a1 a2) = AApp (unrollFacts bs a1) a2
+unrollFacts bs (AApp a1 a2) = AApp (unrollFacts bs a1) (unrollFacts bs a2)
 unrollFacts bs (ALam x e) = ALam x (unrollFacts bs e)
 unrollFacts bs (ACase e x alts) =
   let
@@ -299,11 +299,14 @@ checkAndBuild cEnv n bs ((ADef f e t):ds) =
 simplifyF :: AExp -> CEnv -> [ADecl] -> (AExp, CEnv) -- simplify to a Fixed point
 simplifyF e c d = let (a,b) = simplify e c d in if a == (fst $ simplify a b d) then (a,b) else simplifyF a b d
 
+unrollFactsF :: [ADecl] -> AExp -> AExp -- unrollFacts to a Fixed point
+unrollFactsF ds k = let a = unrollFacts ds k in if a == unrollFacts ds k then a else unrollFactsF ds k
+
 checkAExp :: Name -> [ADecl] -> ContractEnv -> Int -> CEnv -> AExp -> AExp
 checkAExp _ ds _ 0 assume e =
   let
     k = fst $ simplifyF e assume ds
-    n = fst $ simplifyF (unrollFacts ds k) assume ds
+    n = fst $ simplifyF (unrollFactsF ds k) assume ds
     --n = unrollFacts ds k
     --n = k
   in
