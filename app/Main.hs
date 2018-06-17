@@ -300,17 +300,18 @@ simplifyF :: AExp -> CEnv -> [ADecl] -> (AExp, CEnv) -- simplify to a Fixed poin
 simplifyF e c d = let (a,b) = simplify e c d in if a == (fst $ simplify a b d) then (a,b) else simplifyF a b d
 
 unrollFactsF :: [ADecl] -> AExp -> AExp -- unrollFacts to a Fixed point
-unrollFactsF ds k = let a = unrollFacts ds k in if a == unrollFacts ds k then a else unrollFactsF ds k
+unrollFactsF ds k = let a = unrollFacts ds k in if a == unrollFacts ds a then a else unrollFactsF ds a
 
 checkAExp :: Name -> [ADecl] -> ContractEnv -> Int -> CEnv -> AExp -> AExp
 checkAExp _ ds _ 0 assume e =
   let
     k = fst $ simplifyF e assume ds
     n = fst $ simplifyF (unrollFactsF ds k) assume ds
+    n' = unrollFactsF ds n
     --n = unrollFacts ds k
     --n = k
   in
-    n
+    if n == n' then n else fst $ simplifyF n' assume ds 
 checkAExp f ds cEnv n assume e =
   let
     (x,ce) = simplifyF e assume ds

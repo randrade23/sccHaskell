@@ -243,7 +243,7 @@ toFTerm (AGlobal x) = case '$' `elem` (toString x) of
   False -> error ("toFTerm | AGlobal: "++ toString x)
 toFTerm (AConApp c ps) = case '#' `elem` (toString c) of
   True -> toFTerm $ head ps
-  False -> error ("toFTerm | AConApp: " ++ toString ps)
+  False -> FFunc (toString c) (map toFTerm ps)
 toFTerm others = error ("toFTerm: "++ toString others)
 
 toFormula :: AExp -> Formula
