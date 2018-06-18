@@ -135,6 +135,7 @@ toBAD tree@(ACase _ _ _) = map reverse $ traverse [] tree
     traverse path (APrimOp _ es) = concatMap (traverse path) es
     traverse path (AConApp _ es) = concatMap (traverse path) es
     traverse path (ABad _) = [path]
+    traverse path (ALam _ e) = [path] ++ toBAD e
     traverse _ _ = []
 toBAD (APrimOp op es) = concatMap toBAD es
 toBAD (ALam x e) = toBAD e

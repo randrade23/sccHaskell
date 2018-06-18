@@ -77,7 +77,7 @@ simplify' (ALam n e) ce ds = let (a,b) = simplify e ce ds in (ALam n a, ce)
 simplify' a@(APrimOp op es) ce ds = let es' = (map (fst . (\e -> simplify e ce ds)) es) in
   case es of
     ((ACase _ _ _) : _) -> simplify (pushIntoCase a) ce ds
-    _ -> case hasUNR es' of
+    _ -> case hasUNR es of
       True -> (AUnr Me,ce)
       False -> case hasBAD es' of
         True -> (ABad Me,ce)
@@ -311,7 +311,7 @@ checkAExp _ ds _ 0 assume e =
     --n = unrollFacts ds k
     --n = k
   in
-    if n == n' then n else fst $ simplifyF n' assume ds 
+    if n == n' then n else fst $ simplifyF n' assume ds
 checkAExp f ds cEnv n assume e =
   let
     (x,ce) = simplifyF e assume ds
