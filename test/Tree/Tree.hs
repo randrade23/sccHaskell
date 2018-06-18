@@ -1,6 +1,7 @@
 module Tree where
 
-data Tree a = Node a (Tree a) (Tree a) | Leaf
+data Tree a = Node a (Tree a) (Tree a)
+  | Leaf
 
 depth :: Tree Int -> Int
 depth Leaf = 0
