@@ -43,8 +43,25 @@ main = do
   let adeclsWithContracts = toADecls cEnv binds
   let unrolledAndSimplified = checkAndBuild cEnv 0 adeclsWithContracts adeclsWithContracts
   let badBranches = getBadPaths unrolledAndSimplified
-  putStrLn (toString $ unrolledAndSimplified)
-  putStrLn (toString $ badBranches)
+  --putStrLn (toString $ unrolledAndSimplified)
+  --putStrLn (toString $ badBranches)
+  runProofs badBranches
+
+runProofs :: [(Name, [[AExp]])] -> IO ()
+runProofs [] = putStrLn "Done."
+runProofs ((n,es):xs) = do
+  case es of
+    [[]] -> runProofs xs
+    _ -> do
+      mapM (checkPath n) es
+      runProofs xs
+
+checkPath :: Name -> [AExp] -> IO ()
+checkPath n l = do
+  p <- startProver
+  putStrLn ("Testing " ++ toString n ++ "...")
+  checkProver p [] l
+  stopProver p
 
 getBadPaths :: [ADecl] -> [(Name, [[AExp]])]
 getBadPaths = map (\(ADef f e t) -> (f, toBAD e))
