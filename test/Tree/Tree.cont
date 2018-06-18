@@ -1,0 +1,1 @@
+depth :: a:{x | True} -> {r | r >= 0}
