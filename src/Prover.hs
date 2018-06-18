@@ -261,7 +261,7 @@ toFormula (APrimOp op [e1,e2]) =
        ">"  -> FLit (FGt e11 e22)
        ">=" -> FLit (FGeq e11 e22)
 toFormula (APrimOp op es)
- = let fs = map toFormula es
+ = trace (toString es) $ let fs = map toFormula es
    in case toFunc_maybe op of
        Just p -> case p of
                   "not" -> FNot (head fs)
@@ -269,6 +269,7 @@ toFormula (APrimOp op es)
                   "or"  -> FOr fs
 toFormula (AVar v) = BoolTerm (toFTerm (AVar v)) -- e.g. $res && True
 toFormula (AApp (AVar v) e2) = (BoolTerm (toFTerm (AApp (AVar v) e2))) -- e.g. noT1 x
+toFormula (AApp a1 a2) = BoolTerm (toFTerm (AApp a1 a2))
 toFormula others = error ("toFormula others: " ++ toString others)
 
 -- Formula & -> String functions (for Simplify)
