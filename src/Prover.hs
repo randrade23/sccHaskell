@@ -313,7 +313,7 @@ fTermToString :: FTerm -> String
 fTermToString (FInt i) = show i
 fTermToString (FVar v) = v
 fTermToString (FFunc op ts) = let tss = concat $ intersperse " " (map fTermToString ts)
-            in "(" ++ op ++ " " ++ tss ++ ")"
+            in "(" ++ (if op == "==" then "EQ" else op) ++ " " ++ tss ++ ")"
 fTermToString (BlankTerm) = ""
 
 fLitToString :: FLiteral -> String
