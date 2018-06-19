@@ -51,7 +51,7 @@ toAExp :: CoreExpr -> AExp
 toAExp (Var i)
   | Just c <- isDataConWorkId_maybe i = AConApp c []
   | Just op <- isPrimOpId_maybe i     = APrimOp op []
-  | isGlobalId i                      = AGlobal i
+  | isGlobalId i                      = case (showSDocUnsafe $ ppr i) == "error" of {True -> ABad Me; False -> AGlobal i}
   | isLocalId i                       = AVar (idName i)
   | otherwise                         = AVar (idName i)
 

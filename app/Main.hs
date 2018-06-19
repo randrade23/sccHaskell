@@ -170,9 +170,9 @@ rebuildCase x e alts ce ds =
       where
         (alts', nce) = simpl_alt' alts
         covered_cons = [c | (c,_,_) <- alts, c /= DEFAULT]
-        afirst@(DataAlt first) = head covered_cons
+        afirst = head covered_cons
         isLit = case afirst of LitAlt {} -> True; _ -> False
-        all_cons = tyConDataCons (dataConTyCon first)
+        all_cons = let (DataAlt first) = afirst in tyConDataCons (dataConTyCon first)
         missing_cons = all_cons \\ [dc | DataAlt dc <- covered_cons]
         simpl_alt' a = (map (fst . simpl_alt) a, concatMap (snd . simpl_alt) a)
         simpl_alt :: AAlt -> (AAlt, [(AExp, AExp)])
@@ -191,6 +191,7 @@ rebuildCase x e alts ce ds =
         extendScrut ce ns scrut con@(DataAlt dcon) = case lookup scrut ce of
               Nothing -> ce ++ [(scrut, AConApp dcon (map AVar ns))]
               Just _ -> update scrut (AConApp dcon (map AVar ns)) ce
+        extendScrut ce _ _ _ = ce
 
 update k v [] = []
 update k v ((k',v'):xs) = if k' == k then (k,v) : xs else (k',v') : (update k v xs)
