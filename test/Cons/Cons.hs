@@ -25,5 +25,9 @@ reverse' :: List Int -> List Int
 reverse' Nil = Nil
 reverse' (Cons x xs) = append' (reverse' xs) (Cons x Nil)
 
+map' :: (Int -> Int) -> List Int -> List Int
+map' f Nil = Nil
+map' f (Cons x xs) = Cons (f x) (map' f xs)
+
 app = append' Nil (Cons 3 Nil)
 app2 = append' (Cons 3 Nil) Nil

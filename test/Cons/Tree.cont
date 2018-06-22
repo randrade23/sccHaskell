@@ -1,0 +1,6 @@
+depth :: a:{x | True} -> {r | r >= 0}
+count :: a:{x | True} -> {r | r >= 0}
+length' :: a:{x | True} -> {r | r >= 0}
+append' :: a:{x | True} -> b:{y | True} -> {r | length' r == (length' a + length' b)}
+mapTree :: a:{x | True} -> b:{y | True} -> {r | count r == count b}
+collapse :: a:{x | True} -> {r | length' r == count a}
