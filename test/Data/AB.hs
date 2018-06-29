@@ -1,7 +1,6 @@
 module AB where
 
 data A = A1 | A2
-data B = B1 | B2
 
 noA2 :: A -> Bool
 noA2 A1 = True
